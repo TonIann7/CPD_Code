@@ -2,8 +2,24 @@
 #include <omp.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
-// Implementazione della funzione per la somma di due vettori
+/* Sintassi da seguire per l'inserimento delle variabili da riga di comando
+if(argc>1){ 
+        t=atoi(argv[1]);//primo elemento linea di comando
+        M=atoi(argv[2]);
+        N=atoi(argv[3]);
+        alfa=atoi(argv[4]);
+        beta=atoi(argv[5]);
+    }
+    else{
+        printf("Errore usage : . / exec <nThreads> <M> <N> <alpha> <beta >\n");
+        exit(EXIT_FAILURE);   
+         }
+*/
+
+
+// Implementazione della funzione per la somma di due vettori (da non usare)
 void sum_vectors(float *a, float *b, float *c, int N) {
     int i; //indice per i cicli
     int t; //numero di thread
@@ -36,7 +52,8 @@ void sum_vectors(float *a, float *b, float *c, int N) {
         }
 } 
 
-
+//Implementazione dell'algoritmo per la somma di n numeri (I Strategia)
+//Da non usare
  float sum_numbers_first(float *a,int N){
     int i; //dichiarazione variabili
     float sumtot=0; //dichiarazione variabile somma totale
@@ -76,7 +93,8 @@ void sum_vectors(float *a, float *b, float *c, int N) {
  
 }
 
-float sum_numbers_second(float *a,int N){
+//Algoritmo per la somma di N numeri (II Strategia) (Da usare)
+float sum_numbers_second(float *a,int N,int th){
     int i;
     float sumtot = 0;
    
@@ -88,6 +106,7 @@ float sum_numbers_second(float *a,int N){
 
     return sumtot;
 }
+
 
 double pigreco1(int N){
     long int i; //dichiarazione variabili
@@ -141,12 +160,13 @@ double pigreco3(int N){
     return pi;
 }
 
-double * matxvet_righe(int m, int n, double *x, double **A){
+//Algoritmo per il prodotto MatricexVettore prima strategia (righe)
+double * matxvet_righe(int m, int n, double *x, double **A, int th){
     int i,j; //dichiarazione variabili
     double *b; //vettore risultante
 
     b=(double *)calloc(m,sizeof(double)); //allocazione dinamica del vettore risultante
-    #pragma omp parallel for shared(m,n,x,A,b) private(i,j)
+    #pragma omp parallel for shared(m,n,x,A,b) private(i,j) num_threads(th) //direttiva parallela
     for(i=0;i<n;i++){ //ciclo for da i=0 a i=n (righe della matrice)
         for(j=0;j<m;j++){ //ciclo for da j=0 a j=m (colonne della matrice)
             b[i]+=A[i][j]*x[j]; //calcolo del vettore risultante
@@ -156,6 +176,7 @@ double * matxvet_righe(int m, int n, double *x, double **A){
     return b; //restituzione del vettore risultante
 }
 
+/*Algoritmo per il calcolo del prodotto scalare tra due vettori*/
 float prodottoscalare(float *a,float *b, int N){
     int i;
     float result;
@@ -243,46 +264,48 @@ void oddEvenSort(int *a, int N){
 
     }
 }
-
-void prodottoscalarematrice1(float **A, float B,int n,int m){
+//Algoritmo per il prodotto scalarexmatrice (I strategia: per righe)
+void prodottoscalarematrice1(float **A, float B,int righe,int colonne,int th){
 
     int i,j;
-    omp_set_num_threads(3);
-    #pragma omp parallel for private(i,j) shared(A,B,n,m)//direttiva parallela 
-    for(i=0;i<n;i++){//ciclo for per scorrere le righe della matrice
-        for(j=0;j<m;j++){//ciclo for per scorrere le colonne della matrice
+    
+    #pragma omp parallel for private(i,j) shared(A,B,righe,colonne) num_threads(th)//direttiva parallela 
+    for(i=0;i<righe;i++){//ciclo for per scorrere le righe della matrice
+        for(j=0;j<colonne;j++){//ciclo for per scorrere le colonne della matrice
             A[i][j]*=B;//calcolo il prodotto tra la matrice e lo scalare
         
         }
     }
+    /*
     for(i=0;i<n;i++){//ciclo for per scorrere le righe della matrice
         for(j=0;j<m;j++){
     printf("%f\n",A[i][j]);
         }
-    }
+    }*/
 }
-
-void prodottoscalarematrice2(float **A, float B,int n,int m){
+//Algoritmo per il prodotto scalarexmatrice (II strategia: per colonne)
+void prodottoscalarematrice2(float **A, float B,int righe,int colonne,int th){
     int i,j;
-    omp_set_num_threads(3);
-    #pragma omp parallel for private(i,j) shared(A,B,n,m)//direttiva parallela 
-    for(j=0;j<n;j++){//ciclo for per scorrere le righe della matrice
-        for(i=0;i<m;i++){//ciclo for per scorrere le colonne della matrice
+    
+    #pragma omp parallel for private(i,j) shared(A,B,righe,colonne) num_threads(th)//direttiva parallela 
+    for(j=0;j<colonne;j++){//ciclo for per scorrere le righe della matrice
+        for(i=0;i<righe;i++){//ciclo for per scorrere le colonne della matrice
             A[i][j]*=B;//calcolo il prodotto tra la matrice e lo scalare
         
         }
     }
+    /*
     for(i=0;i<n;i++){//ciclo for per scorrere le righe della matrice
         for(j=0;j<m;j++){
     printf("%f\n",A[i][j]);
         }
-    }
+    }*/
 }
 
-void prodottoscalarematrice3(float **A, float alpha,int n,int m,int blockSize){
+void prodottoscalarematrice3(float **A, float alpha,int n,int m,int blockSize,int th){
     int i,j;
-    omp_set_num_threads(3);
-    #pragma omp parallel for collapse(2)
+    
+    #pragma omp parallel for collapse(2) num_threads(th)
     for (int blockRow = 0; blockRow < n; blockRow += blockSize) {
         for (int blockCol = 0; blockCol < m; blockCol += blockSize) {
             for (int i = blockRow; i < blockRow + blockSize && i < n; i++) {
@@ -292,12 +315,12 @@ void prodottoscalarematrice3(float **A, float alpha,int n,int m,int blockSize){
             }
         }
     }
-
+/*
     for(i=0;i<n;i++){//ciclo for per scorrere le righe della matrice
         for(j=0;j<m;j++){
             printf("%f\n",A[i][j]);
         }
-    }
+    }*/
 
 }
 
@@ -334,7 +357,7 @@ void printMatrix(int** matrix, int rows, int columns) {
 
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < columns; j++) {
-            printf("%d ", matrix[i][j]);
+            printf("%d\n", matrix[i][j]);
         }
         printf("\n");
     }
@@ -342,10 +365,106 @@ void printMatrix(int** matrix, int rows, int columns) {
 
 void printArray(int a[], int n){
     for (int i = 0; i < n; i++) {
-        printf("%d", a[i]);
+        printf("%d\n", a[i]);
         if (i < n - 1) {
             printf(", ");
         }
     }
     printf("\n");
+}
+
+double * matxvet_colonne(int righe, int colonne, double *x, double **A,int th){
+    int i,j; //dichiarazione variabili
+    double *b; //vettore risultante
+
+    b=(double *)calloc(righe,sizeof(double)); //allocazione dinamica del vettore risultante
+    #pragma omp parallel for shared(righe,colonne,x,A,b) private(i,j) num_threads(th) //direttiva parallela
+    for(j=0;j<colonne;j++){ 
+        for(i=0;i<righe;i++){ 
+            #pragma omp atomic
+            b[i]+=A[i][j]*x[j]; //calcolo del vettore risultante
+            //la componente i-esima del vettore risultante è data dal prodotto scalare tra la riga i-esima della matrice e il j-esimo elemento del vettore x
+        }
+    }
+    return b; //restituzione del vettore risultante
+
+    
+}
+
+double *matxvet_colonne2(int righe, int colonne, double *x, double **A, int th) {
+    int i, j; // dichiarazione variabili
+    double *result; // vettore risultante
+    result = (double *)calloc(righe, sizeof(double)); // allocazione dinamica del vettore risultante
+
+    #pragma omp parallel shared(result, x, A) private(i, j) num_threads(th)
+    {
+        double *local_result = (double *)calloc(righe, sizeof(double)); // risultato parziale per ogni thread
+
+        #pragma omp for
+        for (j = 0; j < colonne; j++) {
+            for (i = 0; i < righe; i++) {
+                local_result[i] += A[i][j] * x[j];
+            }
+        }
+
+        #pragma omp critical
+        {
+            for (i = 0; i < righe; i++) {
+                result[i] += local_result[i];
+            }
+        }
+
+        free(local_result); // deallocazione del risultato parziale
+    }
+
+    return result; // restituzione del vettore risultante
+}
+
+double *matxvet_colonne3(int righe, int colonne, double *x, double **A, int th) {
+    int i, j; // dichiarazione variabili
+    double *result; // vettore risultante
+
+    result = (double *)calloc(righe, sizeof(double)); // allocazione dinamica del vettore risultante
+
+    // Direttiva parallel for con reduction sull'array result
+    #pragma omp parallel for shared(A, x) private(i, j) reduction(+:result[:righe]) num_threads(th)
+    for (j = 0; j < colonne; j++) {
+        for (i = 0; i < righe; i++) {
+            result[i] += A[i][j] * x[j];
+        }
+    }
+
+    return result; // restituzione del vettore risultante
+}
+
+double * matxvet_terzastrat(int righe,int colonne,int blocksize, double *x,double **A,int th){
+    int i,j;
+    int blockrow,blockcol;
+    double *b;
+    b=(double *)calloc(righe,sizeof(double));
+    #pragma omp parallel for collapse(2) shared(righe,colonne,x,A,b) private(i,j,blockrow,blockcol) num_threads(th)
+    for(blockrow=0;blockrow<righe;blockrow+=blocksize){
+        for(blockcol=0;blockcol<colonne;blockcol+=blocksize){
+            for(i=blockrow;i<blockrow+blocksize && i<righe;i++){
+                for(j=blockcol;j<blockcol+blocksize && j<colonne;j++){
+                    #pragma omp atomic
+                    b[i]+=A[i][j]*x[j];
+                }
+            }
+        }
+    }
+    return b;
+}
+
+double *sommavettori2(int N,double *a,double *b,int th){
+    int i;
+    double *c;
+    c=(double *)calloc(N,sizeof(double));
+    #pragma omp parallel for shared(a,b,c,N) private(i) num_threads(th)
+    for(i=0;i<N;i++){
+        c[i]=a[i]+b[i]
+;
+    }
+    return c;
+
 }

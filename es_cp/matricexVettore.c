@@ -28,14 +28,14 @@ int main(){
     printf("Inserisci b\n"); //Inserimento di b
     scanf("%f", &b);
 
-    float **c = (float**)calloc(N, sizeof(float));
+    float **c = (float**)calloc(N, sizeof(float)); //dichiarazione e allocazione matrice c
     for (i = 0; i < N; i++) {
         c[i] = (float*)calloc(N, sizeof(float));
     }
 
-    double t0 = omp_get_wtime();
-    #pragma omp parallel for shared(a, b, c, N) private(i,j) num_threads(nthreads)
-    for(i = 0; i < N; i++){
+    double t0 = omp_get_wtime(); //calcolo tempo di esecuzione
+    #pragma omp parallel for shared(a, b, c, N) private(i,j) num_threads(nthreads) 
+    for(i = 0; i < N; i++){ //calcolo prodotto scalare
         for(j = 0; j < N; j++){
             c[i][j] = a[i][j] * b;
         }
@@ -57,14 +57,14 @@ int main(){
 
     double t1 = omp_get_wtime();
 
-     for (i = 0; i < N; i++){
+     for (i = 0; i < N; i++){ //stampa matrice c
         for(j = 0; j < N; j++){
             printf("%f ", c[i][j]);
         }
         printf("\n");
     }
 
-    printf("Il tempo vale: %.4f\n", t1 - t0);
+    printf("Il tempo vale: %.4f\n", t1 - t0); //stampa tempo totale di esecuzione operazione parallela
 
     return 0;
 }

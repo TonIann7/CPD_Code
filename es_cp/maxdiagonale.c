@@ -3,6 +3,7 @@ quindi calcolarne il massimo, con una procedura parallela*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <omp.h>
+#include <time.h>
 
 int main(){
 

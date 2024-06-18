@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <omp.h>
 #include <time.h>
-#include <unistd.h>
 
 int main(){
     int N, nthreads, i, j; //Variabile dimensione del problema, numero di threads da utilizzare e contatori

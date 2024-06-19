@@ -47,7 +47,7 @@ int main(){
         #pragma omp parallel for collapse(2)
         for(int blockRow = 0; blockRow < N; blockRow += blockSize){
             for(int blockCol = 0; blockCol < N; blockCol += blockSize){
-                for(int i = vblockRow; i < blockRow + blockSize && i < N; i++){
+                for(int i = blockRow; i < blockRow + blockSize && i < N; i++){
                     for (int j = blockCol; j < blockCol + blockSize && j < N; j++){
                         c[i][j] = a[i][j] * b;
                     }

@@ -1,7 +1,7 @@
 /*
  Implementare un programma parallelo per l’ambiente multicore con np unità processanti che impieghi la libreria OpenMP. 
  Il programma deve essere organizzato come segue: 
-    il core master deve generare due vettori casuali di dimensione N. 
+    il core master deve generare due vettori casuali di dimensione N.
     Ogni core deve sommare ad ogni elemento dei due vettori il proprio identificativo e collaborare alla costruzione di una matrice, 
     di dimensione N×M, con M=2np, le cui colonne, a due a due, sono i due vettori ottenuti nella fase precedente.
 */
@@ -15,7 +15,6 @@
 int main(){
     int N; //dimensione problema
     int nthreads; //numero di threads da utilizzare
-    double alpha; // variabile scalare
 
     //Inserimento dimensione problema
     printf("Inserisci n\n");

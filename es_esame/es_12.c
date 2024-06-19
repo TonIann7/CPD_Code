@@ -39,6 +39,7 @@ int main(){
     double *c = (double*)calloc(nthreads, sizeof(double));
 
     double *local; //vettore locale
+    
     double t0 = omp_get_wtime();
     
     // Sezione parallela
@@ -81,6 +82,7 @@ int main(){
 
     int max = c[0];
 
+    double t2 = omp_get_wtime();
     #pragma omp parallel for shared(c, nthreads) num_threads(nthreads) reduction(max:max)
     for(int i = 0; i < nthreads; i++){
         if(max < c[i]){
@@ -88,7 +90,10 @@ int main(){
         }
     }
 
+    double t3 = omp_get_wtime();
     printf("max del vettore c = %d", max);
+
+    printf("Il tempo di esecuzione è di: %lfs\n", (t1 - t0) + (t3 - t2));
 
     //deallocazione della matrice
     deallocationMatrixDouble(&a, N);

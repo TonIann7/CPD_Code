@@ -35,7 +35,7 @@ int main(){
     // Stampa la matrice
     printMatrixDouble(a, N, M, "Matrice Iniziale");
 
-    //dichiarazione e allocazione vettore c
+    //dichiarazione e allocazione vettore b
     double *b = (double*)calloc(M, sizeof(double));
     
     double t0 = omp_get_wtime();
